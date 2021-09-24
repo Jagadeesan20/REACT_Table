@@ -5,10 +5,22 @@ import { Styles } from "./TableStyles";
 import MOCK_DATA from "./MOCK_DATA.json";
 import { COLUMNS } from "./columns";
 import "./table.css";
+import XLSX from "xlsx";
 
 export const StickyTable = () => {
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => MOCK_DATA, []);
+  const downloadExcel = () => {
+    const workSheet = XLSX.utils.json_to_sheet(MOCK_DATA);
+    const workBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workBook, workSheet, "datas");
+    //Buffers
+    let buf = XLSX.write(workBook, { BookType: "xlsx", type: "buffer" });
+    //Binary string
+    XLSX.write(workBook, { bookType: "xlsx", type: "binary" });
+    //Download
+    XLSX.writeFile(workBook, "PeoplesData.xlsx");
+  };
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
@@ -24,6 +36,7 @@ export const StickyTable = () => {
 
   return (
     <Styles>
+      <button onClick={() => downloadExcel()}>Export</button>
       <div
         {...getTableProps()}
         className="table sticky"
